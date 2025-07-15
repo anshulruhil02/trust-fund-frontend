@@ -142,12 +142,12 @@ const AssetAllocation: React.FC<AssetAllocationProps> = ({
                 mb: 0.5,
               }}
             >
-              {formatCurrencyWithHiding(asset.value, isBalancesHidden)}
+              {formatCurrencyWithHiding(asset.value ?? 0, isBalancesHidden)}
             </Typography>
             
             <Chip
               icon={isPositive ? <TrendingUp sx={{ fontSize: 16 }} /> : <TrendingDown sx={{ fontSize: 16 }} />}
-              label={formatPercentageWithHiding(asset.change24h, isBalancesHidden)}
+              label={formatPercentageWithHiding(asset.change24h ?? 0, isBalancesHidden)}
               size="small"
               sx={{
                 backgroundColor: isPositive ? 'success.light' : 'error.light',
