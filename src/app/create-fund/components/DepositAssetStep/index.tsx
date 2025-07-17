@@ -3,20 +3,18 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { DepositSettings, StepValidation } from '@/types/create-trust';
+import { StepValidation } from '@/types/create-trust';
 
 // Import sub-components (to be created)
 import AssetAllocationSummary from './components/AssetAllocationSummarry';
 import WalletApprovals from './components/WalletApprovals';
 
 interface DepositStepProps {
-  onUpdate: (deposit: Partial<DepositSettings>) => void;
   validation?: StepValidation;
   walletConnected: boolean;
 }
 
 const DepositStep: React.FC<DepositStepProps> = ({
-  onUpdate,
   validation,
   walletConnected,
 }) => {
