@@ -1,5 +1,4 @@
 // src/types/create-trust.ts
-import { AssetAllocation } from './trust-fund';
 
 export interface AssetTarget {
   id: string;

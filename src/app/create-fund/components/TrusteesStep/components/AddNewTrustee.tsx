@@ -22,14 +22,12 @@ import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 interface AddNewTrusteeProps {
   onAddTrustee: (trustee: Omit<Trustee, 'id'>) => void;
   validation?: StepValidation;
-  walletConnected: boolean;
   walletAddressManager: WalletAddressManager; // Use centralized manager
 }
 
 const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
   onAddTrustee,
   validation,
-  walletConnected,
   walletAddressManager,
 }) => {
   const [name, setName] = useState('');

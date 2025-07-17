@@ -28,19 +28,6 @@ const AssetAllocation: React.FC<AssetAllocationProps> = ({
   assets, 
   isBalancesHidden = false 
 }) => {
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  const formatPercentage = (percentage: number): string => {
-    return `${percentage > 0 ? '+' : ''}${percentage.toFixed(1)}%`;
-  };
-
   const getAssetColor = (symbol: string): string => {
     const colors: { [key: string]: string } = {
       'ETH': '#627EEA',
@@ -182,7 +169,7 @@ const AssetAllocation: React.FC<AssetAllocationProps> = ({
 
         {/* Assets List */}
         <List sx={{ p: 0 }}>
-          {assets.map((asset, index) => (
+          {assets.map((asset) => (
             <AssetItem key={asset.symbol} asset={asset} />
           ))}
         </List>

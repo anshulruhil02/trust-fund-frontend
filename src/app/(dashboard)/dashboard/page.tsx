@@ -45,7 +45,7 @@ export default function DashboardPage() {
       {/* Two column layout */}
       <Box sx={{ display: 'flex', gap: 4, mb: 4, flexDirection: { xs: 'column', lg: 'row' } }}>
         <Box sx={{ flex: 2, minWidth: 0 }}>
-          <PortfolioChart data={mockPortfolioData} performancePercentage={5.46} />
+          <PortfolioChart data={mockPortfolioData} />
         </Box>
         <Box sx={{ flex: 1, minWidth: 300 }}>
           <AssetAllocation assets={mockAssetAllocation} isBalancesHidden={false} />

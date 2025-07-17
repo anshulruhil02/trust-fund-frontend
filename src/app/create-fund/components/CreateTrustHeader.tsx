@@ -4,15 +4,9 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
   Button,
-  Paper,
   LinearProgress,
   Chip,
-  IconButton,
 } from '@mui/material';
 import {
   Settings,
@@ -20,9 +14,6 @@ import {
   AccountBalance,
   Preview,
   CheckCircle,
-  Error,
-  Warning,
-  Close,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { CreateTrustStep } from '@/types/create-trust';
@@ -54,13 +45,6 @@ const CreateTrustHeader: React.FC<CreateTrustHeaderProps> = ({
     }
   };
 
-  const getStepColor = (step: CreateTrustStep) => {
-    if (step.isCompleted) return 'success';
-    if (step.isActive) return 'primary';
-    return 'inherit';
-  };
-
-  const currentStepData = steps.find(step => step.id === currentStep);
 
   return (
     <Box>

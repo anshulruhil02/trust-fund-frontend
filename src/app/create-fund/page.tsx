@@ -27,7 +27,6 @@ export default function CreateFundPage() {
     progressPercentage,
     formData,
     isSubmitting,
-    submitError,
     isFirstStep,
     isLastStep,
     nextStep,
@@ -37,7 +36,6 @@ export default function CreateFundPage() {
     addTrustee,
     removeTrustee,
     updateTrustee,
-    submitTrust,
     setWalletConnected,
     walletAddressManager,
   } = useCreateTrust();
@@ -170,7 +168,6 @@ export default function CreateFundPage() {
           <ReviewStep
             formData={formData}
             isSubmitting={isSubmitting}
-            onEdit={goToStep}
           />
         );
       default:

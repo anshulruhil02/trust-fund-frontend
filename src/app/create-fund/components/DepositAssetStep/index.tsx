@@ -57,11 +57,7 @@ const DepositStep: React.FC<DepositStepProps> = ({
       {/* Deposit Sections */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {/* Asset Allocation Summary */}
-        <AssetAllocationSummary
-          deposit={deposit}
-          onUpdate={handleDepositUpdate}
-          validation={validation}
-        />
+        <AssetAllocationSummary/>
 
         {/* Wallet & Approvals */}
         <WalletApprovals

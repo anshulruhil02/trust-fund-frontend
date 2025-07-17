@@ -15,7 +15,7 @@ import {
   InputAdornment,
   FormHelperText,
 } from "@mui/material";
-import { Schedule, Info } from "@mui/icons-material";
+import { Schedule } from "@mui/icons-material";
 import { TrustSettings, StepValidation } from "@/types/create-trust";
 
 interface PayoutSettingsProps {

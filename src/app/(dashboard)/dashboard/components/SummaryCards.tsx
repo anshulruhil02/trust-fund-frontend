@@ -3,7 +3,6 @@
 
 import React from 'react';
 import {
-  Grid,
   Card,
   CardContent,
   Typography,
@@ -44,15 +43,6 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
   returnPercentage,
   isBalancesHidden = false,
 }) => {
-  const formatCurrency = (amount: number, showCents: boolean = true): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: showCents ? 2 : 0,
-      maximumFractionDigits: showCents ? 2 : 0,
-    }).format(amount);
-  };
-
   const formatPercentage = (percentage: number): string => {
     return `${percentage > 0 ? '+' : ''}${percentage.toFixed(1)}%`;
   };

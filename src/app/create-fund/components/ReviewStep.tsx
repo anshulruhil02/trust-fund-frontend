@@ -8,13 +8,11 @@ import { CreateTrustFormData } from '@/types/create-trust';
 interface ReviewStepProps {
   formData: CreateTrustFormData;
   isSubmitting: boolean;
-  onEdit: (stepNumber: number) => void;
 }
 
 const ReviewStep: React.FC<ReviewStepProps> = ({
   formData,
-  isSubmitting,
-  onEdit,
+  isSubmitting
 }) => {
   return (
     <Box>

@@ -17,7 +17,6 @@ import {
   TableRow,
   Chip,
   Avatar,
-  Divider,
 } from '@mui/material';
 import {
   Schedule,
@@ -29,7 +28,6 @@ import {
   SwapHoriz,
   CurrencyExchange,
 } from '@mui/icons-material';
-import { Transaction } from '@/types/trust-fund';
 import { formatCurrencyWithHiding } from '@/utils/balanceUtils';
 
 interface PaymentData {
@@ -87,15 +85,6 @@ const PaymentTabs: React.FC<PaymentTabsProps> = ({
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
-  };
-
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
   };
 
   const formatDate = (dateString: string): string => {
@@ -192,7 +181,7 @@ const PaymentTabs: React.FC<PaymentTabsProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paymentHistory.map((payment, index) => (
+            {paymentHistory.map((payment) => (
               <TableRow key={payment.id} sx={{ '&:hover': { backgroundColor: 'action.hover' } }}>
                 <TableCell>{formatDate(payment.date)}</TableCell>
                 <TableCell>{payment.type}</TableCell>
@@ -227,7 +216,7 @@ const PaymentTabs: React.FC<PaymentTabsProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {deposits.map((deposit, index) => (
+            {deposits.map((deposit) => (
               <TableRow key={deposit.id} sx={{ '&:hover': { backgroundColor: 'action.hover' } }}>
                 <TableCell>{formatDate(deposit.date)}</TableCell>
                 <TableCell>{deposit.type}</TableCell>
@@ -287,7 +276,7 @@ const PaymentTabs: React.FC<PaymentTabsProps> = ({
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {activityLog.map((activity, index) => (
+          {activityLog.map((activity) => (
             <Box
               key={activity.id}
               sx={{

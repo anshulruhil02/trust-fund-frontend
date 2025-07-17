@@ -9,14 +9,12 @@ import {
   TextField,
   Button,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   FormControlLabel,
   Checkbox,
-  Alert,
 } from '@mui/material';
-import { Person, CheckCircle } from '@mui/icons-material';
+import { Person } from '@mui/icons-material';
 import { TrustSettings, StepValidation, TrusteePermissions } from '@/types/create-trust';
 import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 
@@ -37,7 +35,7 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
 }) => {
   // Mock connected wallet (in real app, this would come from wallet connection)
   const connectedWallet = '0x742d35Cc6634C05329925a3b8D4C9db96590b5b8';
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress] = useState('');
   // --- FIX: Read all values directly from the settings prop ---
   const creatorAddress = settings.creatorAddress || '';
   const beneficiaryAddress = settings.beneficiaryAddress || '';
@@ -88,29 +86,6 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
 
   const useConnectedWalletAsBeneficiary = () => {
     onUpdate({ beneficiaryAddress: connectedWallet });
-  };
-
-  const getFieldError = (fieldName: string): string | undefined => {
-    const errors: { [key: string]: string } = {};
-    const warnings: { [key: string]: string } = {};
-    // Wallet address validation using centralized manager
-    if (walletAddress && walletAddress.trim().length > 0) {
-      const addressValidation = walletAddressManager.validateNewAddress(
-        walletAddress.trim(), 
-        'trustee'
-      );
-      
-      if (!addressValidation.isValid) {
-        errors.walletAddress = addressValidation.error || 'Invalid address';
-      } else if (addressValidation.warning) {
-        warnings.walletAddress = addressValidation.warning;
-      }
-    }
-    return undefined;
-  };
-
-  const isFieldError = (fieldName: string): boolean => {
-    return !!getFieldError(fieldName);
   };
 
   const getAddressFeedback = (address: string): { error?: string; warning?: string } => {

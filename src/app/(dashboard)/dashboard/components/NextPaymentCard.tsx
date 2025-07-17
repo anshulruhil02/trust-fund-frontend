@@ -35,14 +35,6 @@ const NextPaymentCard: React.FC<NextPaymentCardProps> = ({
   isClaimable = true,
   isBalancesHidden = false,
 }) => {
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
 
   const formatDate = (dateString: string): string => {
     // If it's already formatted (like "Nov 14, 2025"), return as is

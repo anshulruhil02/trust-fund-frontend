@@ -30,16 +30,12 @@ import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 interface InvitedTrusteesProps {
   trustees: Trustee[];
   onRemoveTrustee: (trusteeId: string) => void;
-  onUpdateTrustee: (trusteeId: string, updates: Partial<Trustee>) => void;
-  validation?: StepValidation;
   walletAddressManager: WalletAddressManager; // Add wallet address manager
 }
 
 const InvitedTrustees: React.FC<InvitedTrusteesProps> = ({
   trustees,
   onRemoveTrustee,
-  onUpdateTrustee,
-  validation,
   walletAddressManager,
 }) => {
   // Handle remove trustee with logging for debugging

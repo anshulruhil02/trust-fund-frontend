@@ -1,4 +1,3 @@
-// src/app/create-fund/components/DepositStep/components/AssetAllocationSummary.tsx
 'use client';
 
 import React from 'react';
@@ -13,20 +12,10 @@ import {
   ListItemText,
   Chip
 } from '@mui/material';
-import { PieChart, TrendingUp } from '@mui/icons-material';
-import { DepositSettings, StepValidation } from '@/types/create-trust';
+import { PieChart } from '@mui/icons-material';
 
-interface AssetAllocationSummaryProps {
-  deposit: Partial<DepositSettings>;
-  onUpdate: (deposit: Partial<DepositSettings>) => void;
-  validation?: StepValidation;
-}
-
-const AssetAllocationSummary: React.FC<AssetAllocationSummaryProps> = ({
-  deposit,
-  onUpdate,
-  validation,
-}) => {
+// The component is now defined as a simple arrow function.
+const AssetAllocationSummary = () => {
   // Mock asset data based on your UI mockup
   const mockAssets = [
     {

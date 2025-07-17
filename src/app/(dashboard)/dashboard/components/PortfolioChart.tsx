@@ -23,15 +23,23 @@ import {
 import { PortfolioData } from '@/types/trust-fund';
 
 interface PortfolioChartProps {
-  data: PortfolioData[];
-  performancePercentage: number;
+  data: PortfolioData[]
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: {
+    value: number;
+    // You can add other properties from the payload here if you use them
+    // e.g., name: string; color: string;
+  }[];
+  label?: string;
 }
 
 type TimePeriod = '1W' | '1M' | 'YTD' | '1Y' | '5Y' | 'ALL';
 
 const PortfolioChart: React.FC<PortfolioChartProps> = ({
-  data,
-  performancePercentage,
+  data
 }) => {
   const theme = useTheme();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('1Y');
@@ -107,29 +115,29 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({
     }).format(value);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <Box
-          sx={{
-            backgroundColor: 'background.paper',
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 1,
-            p: 2,
-            boxShadow: 2,
-          }}
-        >
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-            {label}
-          </Typography>
-          <Typography variant="h6" sx={{ color: 'success.main', fontWeight: 600 }}>
-            {formatTooltipValue(payload[0].value)}
-          </Typography>
-        </Box>
-      );
-    }
-    return null;
-  };
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <Box
+        sx={{
+          backgroundColor: 'background.paper',
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 1,
+          p: 2,
+          boxShadow: 2,
+        }}
+      >
+        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+          {label}
+        </Typography>
+        <Typography variant="h6" sx={{ color: 'success.main', fontWeight: 600 }}>
+          {formatTooltipValue(payload[0].value)}
+        </Typography>
+      </Box>
+    );
+  }
+  return null;
+};
 
   const getYAxisDomain = () => {
     const values = filteredData.map(d => d.value);

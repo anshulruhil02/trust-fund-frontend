@@ -1,7 +1,7 @@
 // src/app/governance/components/CreateProposalModal/Step1_SelectAction.tsx
 'use client';
 import React from 'react';
-import { Box, Typography, Button, RadioGroup, FormControlLabel, Radio, Paper, Grid } from '@mui/material';
+import { Box, Typography, Button, RadioGroup, FormControlLabel, Radio, Paper } from '@mui/material';
 import { NewProposalData, ProposalAction, ProposalScope } from '../../../../../types/proposal'; // Adjust path as needed
 import {
     NoStroller, AttachMoney, PieChartOutline, MoneyOff,
@@ -25,7 +25,6 @@ const proposalActions = [
 ];
 
 export const Step1_SelectAction: React.FC<Step1Props> = ({ onNext, data, setData }) => {
-  // This handler updates the 'scope' in the shared data object
   const handleScopeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, scope: event.target.value as ProposalScope });
   };
@@ -36,9 +35,8 @@ export const Step1_SelectAction: React.FC<Step1Props> = ({ onNext, data, setData
 
   return (
     <Box>
-      {/* --- Proposal Scope Section (Corrected) --- */}
+      {/* --- Proposal Scope Section --- */}
       <Typography variant="h6" sx={{ mb: 1 }}>Proposal Scope</Typography>
-      {/* This RadioGroup is now a controlled component using the 'value' prop */}
       <RadioGroup value={data.scope} onChange={handleScopeChange}>
         <Paper variant="outlined" sx={{ p: 1.5, mb: 1, borderRadius: 2 }}>
           <FormControlLabel value="trust" control={<Radio />} label="Trust Level" />
@@ -54,36 +52,42 @@ export const Step1_SelectAction: React.FC<Step1Props> = ({ onNext, data, setData
         </Paper>
       </RadioGroup>
 
-      {/* --- Select Action Section (Unchanged) --- */}
+      {/* --- Select Action Section --- */}
       <Typography variant="h6" sx={{ mb: 2 }}>Select Action</Typography>
       <RadioGroup value={data.action} onChange={handleActionChange}>
-        <Grid container spacing={2}>
+        {/* We now use a Box with CSS Grid instead of the MUI Grid component */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr', // Creates two equal columns
+            gap: 2, // Sets the space between items
+          }}
+        >
           {proposalActions.map((action) => (
-            <Grid item xs={6} key={action.id}  {...({} as any)}>
-              <Paper 
-                variant="outlined"
-                sx={{ 
-                  p: 1.5, 
-                  borderRadius: 2,
-                  borderColor: data.action === action.id ? 'primary.main' : 'divider',
-                  borderWidth: data.action === action.id ? '2px' : '1px',
-                }}
-              >
-                <FormControlLabel
-                  value={action.id}
-                  control={<Radio sx={{ mr: 1 }} />}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {action.icon}
-                      <Typography variant="body1">{action.label}</Typography>
-                    </Box>
-                  }
-                  sx={{ width: '100%', m: 0 }}
-                />
-              </Paper>
-            </Grid>
+            <Paper
+              key={action.id}
+              variant="outlined"
+              sx={{ 
+                p: 1.5, 
+                borderRadius: 2,
+                borderColor: data.action === action.id ? 'primary.main' : 'divider',
+                borderWidth: data.action === action.id ? '2px' : '1px',
+              }}
+            >
+              <FormControlLabel
+                value={action.id}
+                control={<Radio sx={{ mr: 1 }} />}
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {action.icon}
+                    <Typography variant="body1">{action.label}</Typography>
+                  </Box>
+                }
+                sx={{ width: '100%', m: 0 }}
+              />
+            </Paper>
           ))}
-        </Grid>
+        </Box>
       </RadioGroup>
       
       {/* --- Navigation --- */}
