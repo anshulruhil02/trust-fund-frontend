@@ -67,7 +67,6 @@ const TrusteesStep: React.FC<TrusteesStepProps> = ({
         <AddNewTrustee
           onAddTrustee={onAddTrustee}
           validation={validation}
-          walletConnected={walletConnected}
           walletAddressManager={walletAddressManager} // Pass address manager
         />
 
@@ -75,8 +74,6 @@ const TrusteesStep: React.FC<TrusteesStepProps> = ({
         <InvitedTrustees
           trustees={trustees}
           onRemoveTrustee={onRemoveTrustee}
-          onUpdateTrustee={onUpdateTrustee}
-          validation={validation}
           walletAddressManager={walletAddressManager} // Pass address manager
         />
 
