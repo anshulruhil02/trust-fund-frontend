@@ -16,10 +16,8 @@ interface TrusteesStepProps {
   governance: Partial<GovernanceSettings>;
   onAddTrustee: (trustee: Omit<Trustee, 'id'>) => void;
   onRemoveTrustee: (trusteeId: string) => void;
-  onUpdateTrustee: (trusteeId: string, updates: Partial<Trustee>) => void;
   onUpdateGovernance: (governance: Partial<GovernanceSettings>) => void;
   validation?: StepValidation;
-  walletConnected: boolean;
   walletAddressManager: WalletAddressManager; // New prop
 }
 
@@ -28,10 +26,8 @@ const TrusteesStep: React.FC<TrusteesStepProps> = ({
   governance,
   onAddTrustee,
   onRemoveTrustee,
-  onUpdateTrustee,
   onUpdateGovernance,
   validation,
-  walletConnected,
   walletAddressManager,
 }) => {
   return (

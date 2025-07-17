@@ -147,9 +147,7 @@ export default function CreateFundPage() {
             governance={formData.governance}
             onAddTrustee={addTrustee}
             onRemoveTrustee={removeTrustee}
-            onUpdateTrustee={updateTrustee}
             onUpdateGovernance={(governance) => updateFormData('governance', governance)}
-            walletConnected={isWalletConnected}
             walletAddressManager={walletAddressManager}
             {...baseProps}
           />
