@@ -228,19 +228,6 @@ export const useCreateTrust = () => {
     }));
   }, []);
 
-  // Update trustee
-  const updateTrustee = useCallback((trusteeId: string, updates: Partial<Trustee>) => {
-    setState(prev => ({
-      ...prev,
-      formData: {
-        ...prev.formData,
-        trustees: prev.formData.trustees.map(t => 
-          t.id === trusteeId ? { ...t, ...updates } : t
-        )
-      }
-    }));
-  }, []);
-
   // Reset form
   const resetForm = useCallback(() => {
     setState({
@@ -323,7 +310,6 @@ export const useCreateTrust = () => {
     // Trustee actions
     addTrustee,
     removeTrustee,
-    updateTrustee,
     
     // Submission
     submitTrust,

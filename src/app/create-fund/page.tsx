@@ -35,7 +35,6 @@ export default function CreateFundPage() {
     updateFormData,
     addTrustee,
     removeTrustee,
-    updateTrustee,
     setWalletConnected,
     walletAddressManager,
   } = useCreateTrust();
