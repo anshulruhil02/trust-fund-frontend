@@ -35,7 +35,6 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
 }) => {
   // Mock connected wallet (in real app, this would come from wallet connection)
   const connectedWallet = '0x742d35Cc6634C05329925a3b8D4C9db96590b5b8';
-  const [walletAddress] = useState('');
   // --- FIX: Read all values directly from the settings prop ---
   const creatorAddress = settings.creatorAddress || '';
   const beneficiaryAddress = settings.beneficiaryAddress || '';

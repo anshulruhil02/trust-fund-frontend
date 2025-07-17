@@ -214,7 +214,7 @@ const PayoutSettings: React.FC<PayoutSettingsProps> = ({
             <Select
               value={frequency}
               onChange={(e) =>
-                handleUpdate({ payoutFrequency: e.target.value as any })
+                handleUpdate({ payoutFrequency: e.target.value })
               }
               label="Frequency"
               error={isFieldError("frequency")}
@@ -295,7 +295,7 @@ const PayoutSettings: React.FC<PayoutSettingsProps> = ({
             <Select
               value={payoutMethod}
               onChange={(e) =>
-                handleUpdate({ payoutMethod: e.target.value as any })
+                handleUpdate({ payoutMethod: e.target.value })
               }
               label="Payout Method"
               error={isFieldError("method")}

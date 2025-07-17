@@ -109,6 +109,7 @@ export const validationRules: StepValidationRules = {
 };
 
 // Validate individual field
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const validateField = (fieldName: string, value: any, rules: ValidationRule[]): string[] => {
   const errors: string[] = [];
 

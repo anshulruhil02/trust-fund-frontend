@@ -11,19 +11,15 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
-import { AccountBalanceWallet, CheckCircle, Warning } from '@mui/icons-material';
+import { AccountBalanceWallet, CheckCircle } from '@mui/icons-material';
 import { DepositSettings, StepValidation } from '@/types/create-trust';
 
 interface WalletApprovalsProps {
-  deposit: Partial<DepositSettings>;
-  onUpdate: (deposit: Partial<DepositSettings>) => void;
   validation?: StepValidation;
   walletConnected: boolean;
 }
 
 const WalletApprovals: React.FC<WalletApprovalsProps> = ({
-  deposit,
-  onUpdate,
   validation,
   walletConnected,
 }) => {

@@ -61,8 +61,6 @@ const DepositStep: React.FC<DepositStepProps> = ({
 
         {/* Wallet & Approvals */}
         <WalletApprovals
-          deposit={deposit}
-          onUpdate={handleDepositUpdate}
           validation={validation}
           walletConnected={walletConnected}
         />

@@ -118,6 +118,7 @@ export interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   custom?: (value: any) => boolean;
   message: string;
 }

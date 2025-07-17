@@ -24,7 +24,7 @@ import {
   HourglassEmpty,
   Warning
 } from '@mui/icons-material';
-import { Trustee, StepValidation } from '@/types/create-trust';
+import { Trustee } from '@/types/create-trust';
 import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 
 interface InvitedTrusteesProps {
@@ -92,7 +92,9 @@ const InvitedTrustees: React.FC<InvitedTrusteesProps> = ({
     };
 
     return Object.entries(trustee.permissions)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, value]) => value === true)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .map(([key, _]) => permissionLabels[key])
       .filter(Boolean);
   };
