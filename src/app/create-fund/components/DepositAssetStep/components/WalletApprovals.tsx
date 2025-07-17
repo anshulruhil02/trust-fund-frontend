@@ -12,7 +12,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { AccountBalanceWallet, CheckCircle } from '@mui/icons-material';
-import { DepositSettings, StepValidation } from '@/types/create-trust';
+import { StepValidation } from '@/types/create-trust';
 
 interface WalletApprovalsProps {
   validation?: StepValidation;
@@ -117,7 +117,7 @@ const WalletApprovals: React.FC<WalletApprovalsProps> = ({
             
             {/* Mock approval items */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {['ETH', 'BTC'].map((token, index) => (
+              {['ETH', 'BTC'].map((token) => (
                 <Box 
                   key={token}
                   sx={{ 

@@ -157,7 +157,6 @@ export default function CreateFundPage() {
       case 3:
         return (
           <DepositStep
-            deposit={formData.deposit}
             onUpdate={(deposit) => updateFormData('deposit', deposit)}
             walletConnected={isWalletConnected}
             {...baseProps}

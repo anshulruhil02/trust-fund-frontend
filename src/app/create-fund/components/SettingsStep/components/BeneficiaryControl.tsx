@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from 'react'; // Removed useState, useEffect
 import {
   Box,
   Card,

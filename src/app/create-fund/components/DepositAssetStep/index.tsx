@@ -10,22 +10,16 @@ import AssetAllocationSummary from './components/AssetAllocationSummarry';
 import WalletApprovals from './components/WalletApprovals';
 
 interface DepositStepProps {
-  deposit: Partial<DepositSettings>;
   onUpdate: (deposit: Partial<DepositSettings>) => void;
   validation?: StepValidation;
   walletConnected: boolean;
 }
 
 const DepositStep: React.FC<DepositStepProps> = ({
-  deposit,
   onUpdate,
   validation,
   walletConnected,
 }) => {
-  // Handle updates from child components
-  const handleDepositUpdate = (updates: Partial<DepositSettings>) => {
-    onUpdate(updates);
-  };
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
