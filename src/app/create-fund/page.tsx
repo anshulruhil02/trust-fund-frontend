@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Box, Container, Button, Alert } from "@mui/material";
+import { Box, Container, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import CreateTrustHeader from "./components/CreateTrustHeader";
 import SettingsStep from "./components/SettingsStep";
@@ -34,8 +34,7 @@ export default function CreateFundPage() {
       canRemoveTrustee: false,
       canDisablePayouts: false,
     });
-
-  // const [hasAttemptedNext, setHasAttemptedNext] = useState(false); // No longer needed for now
+  
 
   const {
     steps,
@@ -103,24 +102,6 @@ export default function CreateFundPage() {
 
   // Handle next step with validation
   const handleNext = () => {
-    // --- VALIDATION LOGIC IS COMMENTED OUT ---
-    // setHasAttemptedNext(true);
-
-    // const validation = validateCurrentStep();
-
-    // if (!validation.isValid) {
-    //   setTimeout(() => {
-    //     const firstErrorElement = document.querySelector('[data-error="true"]');
-    //     if (firstErrorElement) {
-    //       firstErrorElement.scrollIntoView({
-    //         behavior: 'smooth',
-    //         block: 'center'
-    //       });
-    //     }
-    //   }, 10);
-    //   return; // Block navigation
-    // }
-
     if (!isLastStep) {
       nextStep();
       // setHasAttemptedNext(false); // Reset for next step
