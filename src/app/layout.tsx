@@ -1,8 +1,9 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import ThemeRegistry from '@/components/ThemeRegistry'
+import ThemeRegistry from '@/components/ThemeRegistry';
+import { Providers } from './providers'; // Import the new Web3 provider
+
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
@@ -21,9 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
-        <ThemeRegistry>
-          {children}
-        </ThemeRegistry>
+        {/* The new Providers component wraps everything to provide wallet state */}
+        <Providers>
+          <ThemeRegistry>
+            {children}
+          </ThemeRegistry>
+        </Providers>
       </body>
     </html>
   );

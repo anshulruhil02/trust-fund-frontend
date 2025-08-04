@@ -1,0 +1,50 @@
+// This is your Prisma schema file.
+// It defines the structure of your database tables.
+
+// This block configures the Prisma Client generation.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// This block configures your database connection.
+// It tells Prisma to use the environment variable from your .env.local file.
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") 
+}
+
+// 1. The Users Table
+model User {
+  id                String     @id @default(uuid())
+  walletAddress     String     @unique
+  fireblocksVaultId String
+  email             String?
+  createdAt         DateTime   @default(now())
+  trustsCreated     Trust[]    @relation("Creator")
+  proposalsProposed Proposal[] @relation("Proposer")
+}
+
+// 2. The Trusts Table
+model Trust {
+  id               String     @id @default(uuid())
+  contractAddress  String     @unique
+  name             String
+  purposeStatement String
+  createdAt        DateTime   @default(now())
+  creatorUserId    String
+  creator          User       @relation("Creator", fields: [creatorUserId], references: [id])
+  proposals        Proposal[]
+}
+
+// 3. The Proposals Table
+model Proposal {
+  id             String   @id @default(uuid())
+  onChainId      Int
+  title          String
+  description    String
+  createdAt      DateTime @default(now())
+  trustId        String
+  trust          Trust    @relation(fields: [trustId], references: [id])
+  proposerUserId String
+  proposer       User     @relation("Proposer", fields: [proposerUserId], references: [id])
+}

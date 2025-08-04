@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import {
   Box,
   Card,
@@ -10,73 +11,33 @@ import {
   FormControl,
   Select,
   MenuItem,
-  FormControlLabel,
-  Checkbox,
 } from '@mui/material';
 import { Person } from '@mui/icons-material';
-import { TrustSettings, StepValidation, TrusteePermissions } from '@/types/create-trust';
+import { TrustSettings } from '@/types/create-trust';
 import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 
 interface BeneficiaryControlProps {
   settings: Partial<TrustSettings>;
   onUpdate: (settings: Partial<TrustSettings>) => void;
-  validation?: StepValidation;
-  hasAttemptedSubmit?: boolean;
   walletAddressManager: WalletAddressManager;
 }
 
 const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
   settings,
   onUpdate,
-  validation,
-  hasAttemptedSubmit = false,
   walletAddressManager
 }) => {
-  // Mock connected wallet (in real app, this would come from wallet connection)
   const connectedWallet = '0x742d35Cc6634C05329925a3b8D4C9db96590b5b8';
-  // --- FIX: Read all values directly from the settings prop ---
   const creatorAddress = settings.creatorAddress || '';
   const beneficiaryAddress = settings.beneficiaryAddress || '';
   const distributionMethod = settings.distributionMethod || 'creator';
   const numberOfTrustees = settings.numberOfTrustees || 1;
   const quorumRequired = settings.quorumRequired || 1;
-  const permissions = settings.trusteePermissions || {
-      canDissolve: false,
-      canChangeBeneficiary: false,
-      canAdjustPayouts: false,
-      canAddRemoveTrustees: false,
-      canModifyAssetAllocation: false,
-      canRemoveTrustee: false,
-      canDisablePayouts: false,
-  };
 
-  // Distribution method options
   const distributionOptions = [
     { value: 'creator', label: 'All assets to creator' },
     { value: 'beneficiary', label: 'All assets to beneficiary' }
   ];
-
-  // Trustee permission options
-  const permissionOptions = [
-    { key: 'canDissolve', label: 'Can dissolve trust (Make Revocable)' },
-    { key: 'canChangeBeneficiary', label: 'Can change beneficiary' },
-    { key: 'canAdjustPayouts', label: 'Can adjust payouts (max 10%)' },
-    { key: 'canAddRemoveTrustees', label: 'Can add/remove trustees' },
-    { key: 'canModifyAssetAllocation', label: 'Can modify asset allocation' },
-    { key: 'canRemoveTrustee', label: 'Can remove Trustee' },
-    { key: 'canDisablePayouts', label: 'Can Disable Payouts' },
-  ];
-
-  // --- FIX: Event handlers now call onUpdate directly ---
-  const handlePermissionChange = (key: keyof TrusteePermissions) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newPermissions = {
-      ...permissions,
-      [key]: event.target.checked,
-    };
-    onUpdate({ trusteePermissions: newPermissions });
-  };
 
   const useConnectedWalletAsCreator = () => {
     onUpdate({ creatorAddress: connectedWallet });
@@ -85,35 +46,7 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
   const useConnectedWalletAsBeneficiary = () => {
     onUpdate({ beneficiaryAddress: connectedWallet });
   };
-
-  const getAddressFeedback = (address: string): { error?: string; warning?: string } => {
-    if (!address || address.trim().length === 0) {
-      // Defer 'required' error to the main validation on submit
-      return {}; 
-    }
-    // Use the manager for instant format/duplicate checks
-    const validationResult = walletAddressManager.validateNewAddress(address, 'beneficiary');
-    if (!validationResult.isValid) {
-      return { error: validationResult.error };
-    }
-    if (validationResult.warning) {
-      return { warning: validationResult.warning };
-    }
-    return {};
-  };
-
-  const creatorFeedback = getAddressFeedback(creatorAddress);
-  const beneficiaryFeedback = getAddressFeedback(beneficiaryAddress);
-
-  // Parent validation errors (from clicking "Next") should take precedence
-  const finalCreatorError = hasAttemptedSubmit 
-    ? validation?.errors.find(e => e.toLowerCase().includes('creator')) 
-    : creatorFeedback.error;
-
-  const finalBeneficiaryError = hasAttemptedSubmit
-    ? validation?.errors.find(e => e.toLowerCase().includes('beneficiary'))
-    : beneficiaryFeedback.error;
-
+  
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
       <CardContent sx={{ p: 4 }}>
@@ -123,7 +56,7 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
           sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}
         >
           <Person color="primary" />
-          Beneficiary & Trustee Control
+          Beneficiary Control
         </Typography>
 
         {/* Creator Wallet Address */}
@@ -137,9 +70,7 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
               value={creatorAddress}
               onChange={(e) => onUpdate({ creatorAddress: e.target.value })}
               placeholder="0x..."
-              error={!!finalCreatorError}
-              helperText={finalCreatorError || creatorFeedback.warning || "The wallet address of the trust's creator"}
-              data-error={!!(hasAttemptedSubmit && validation?.errors.find(e => e.toLowerCase().includes('creator')))}
+              helperText={"The wallet address of the trust's creator"}
             />
             <Button
               variant="outlined"
@@ -162,10 +93,7 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
               value={beneficiaryAddress}
               onChange={(e) => onUpdate({ beneficiaryAddress: e.target.value })}
               placeholder="0x..."
-              error={!!finalBeneficiaryError}
-              helperText={finalBeneficiaryError || beneficiaryFeedback.warning || "The wallet address of the beneficiary"}
-               // Add a data-error attribute if the parent validation fails
-              data-error={!!(hasAttemptedSubmit && validation?.errors.find(e => e.toLowerCase().includes('beneficiary')))}
+              helperText={"The wallet address of the beneficiary"}
             />
             <Button
               variant="outlined"
@@ -194,56 +122,6 @@ const BeneficiaryControl: React.FC<BeneficiaryControlProps> = ({
               ))}
             </Select>
           </FormControl>
-        </Box>
-
-        {/* Trustees Section */}
-        <Box>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            Trustees
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 3, mb: 4 }}>
-            <TextField
-              label="Number of Trustees"
-              fullWidth
-              type="number"
-              value={numberOfTrustees}
-              onChange={(e) => onUpdate({ numberOfTrustees: Number(e.target.value) })}
-              inputProps={{ min: 1, max: 10 }}
-            />
-            <TextField
-              label="Quorum Required"
-              fullWidth
-              type="number"
-              value={quorumRequired}
-              onChange={(e) => onUpdate({ quorumRequired: Number(e.target.value) })}
-              inputProps={{ min: 1, max: numberOfTrustees }}
-              error={quorumRequired > numberOfTrustees}
-              helperText={
-                quorumRequired > numberOfTrustees 
-                  ? 'Quorum cannot exceed number of trustees' 
-                  : ''
-              }
-            />
-          </Box>
-          <Box>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-              Trustee Permissions
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {permissionOptions.map((option) => (
-                <FormControlLabel
-                  key={option.key}
-                  control={
-                    <Checkbox
-                      checked={permissions[option.key as keyof TrusteePermissions]}
-                      onChange={handlePermissionChange(option.key as keyof TrusteePermissions)}
-                    />
-                  }
-                  label={option.label}
-                />
-              ))}
-            </Box>
-          </Box>
         </Box>
       </CardContent>
     </Card>

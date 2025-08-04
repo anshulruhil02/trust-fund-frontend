@@ -152,9 +152,8 @@ const PayoutSettings: React.FC<PayoutSettingsProps> = ({
 
   const currencyOptions = [
     { value: "USD", label: "USD", symbol: "$" },
-    { value: "USDC", label: "USDC", symbol: "$" },
-    { value: "USDT", label: "USDT", symbol: "$" },
-    { value: "ETH", label: "ETH", symbol: "Ξ" },
+    { value: "EUR", label: "EUR", symbol: "$" },
+    { value: "CAD", label: "CAD", symbol: "$" },
   ];
 
   const months = Array.from({ length: 12 }, (_, i) =>

@@ -63,12 +63,12 @@ const SettingsStep: React.FC<SettingsStepProps> = ({
           validation={validation}
           hasAttemptedSubmit={hasAttemptedSubmit}
         />
-        <AssetAllocation
+        {/* <AssetAllocation
           settings={settings}
           onUpdate={handleSettingsUpdate}
           validation={validation}
           hasAttemptedSubmit={hasAttemptedSubmit} 
-        />
+        /> */}
         <PayoutSettings
           settings={settings}
           onUpdate={handleSettingsUpdate}
@@ -78,8 +78,8 @@ const SettingsStep: React.FC<SettingsStepProps> = ({
         <BeneficiaryControl
           settings={settings}
           onUpdate={handleSettingsUpdate}
-          validation={validation}
-          hasAttemptedSubmit={hasAttemptedSubmit}
+          // validation={validation}
+          // hasAttemptedSubmit={hasAttemptedSubmit}
           walletAddressManager={walletAddressManager}
         />
 

@@ -115,7 +115,7 @@ const TrustNameDuration: React.FC<TrustNameDurationProps> = ({
           }}
         >
           <Info color="primary" />
-          Trust Name & Duration
+          Trust Name
         </Typography>
 
         {/* Trust Name */}
@@ -146,7 +146,7 @@ const TrustNameDuration: React.FC<TrustNameDurationProps> = ({
             sx={{ mb: 2, color: 'text.secondary' }}
           >
             Describe the purpose and goals of this trust. This section will be published 
-            in full and forever unchangeable on the blockchain.
+            in full and forever immutable on the blockchain.
           </Typography>
           <TextField
             fullWidth
@@ -162,99 +162,6 @@ const TrustNameDuration: React.FC<TrustNameDurationProps> = ({
             }
             data-error={isFieldError('purpose statement')}
           />
-        </Box>
-
-        {/* Duration Selection */}
-        <Box>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Duration
-          </Typography>
-          
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            {/* Perpetual Option */}
-            <Button
-              variant={settings.duration === 'perpetual' ? 'contained' : 'outlined'}
-              onClick={() => handleDurationChange('perpetual')}
-              sx={{
-                flex: 1,
-                py: 2,
-                px: 3,
-                borderRadius: 2,
-                textAlign: 'left',
-                justifyContent: 'flex-start',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                height: 'auto',
-                minHeight: 80,
-              }}
-            >
-              <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                Perpetuity
-              </Typography>
-              <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                No end date
-              </Typography>
-            </Button>
-
-            {/* Fixed Term Option */}
-            <Button
-              variant={settings.duration === 'fixed' ? 'contained' : 'outlined'}
-              onClick={() => handleDurationChange('fixed')}
-              sx={{
-                flex: 1,
-                py: 2,
-                px: 3,
-                borderRadius: 2,
-                textAlign: 'left',
-                justifyContent: 'flex-start',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                height: 'auto',
-                minHeight: 80,
-              }}
-            >
-              <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                Fixed Term
-              </Typography>
-              <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                Specific end date
-              </Typography>
-            </Button>
-          </Box>
-
-          {/* End Date Field (conditional) */}
-          {settings.duration === 'fixed' && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
-                End Date
-              </Typography>
-              <Box sx={{ maxWidth: 400 }}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  value={settings.endDate || ''}
-                  onChange={handleChange('endDate')}
-                  error={isFieldError('end date')}
-                  helperText={getFieldError('end date') || 'Select when the trust should end'}
-                  slotProps={{
-                    htmlInput: {
-                      min: currentDate, // Prevent selecting past dates
-                    },
-                  }}
-                  sx={{
-                    '& .MuiInputBase-input': {
-                      padding: '16px 14px', // Increase padding for larger click area
-                      fontSize: '1.1rem', // Larger font size
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      minHeight: '56px', // Ensure consistent height
-                    }
-                  }}
-                  data-error={isFieldError('end date')}
-                />
-              </Box>
-            </Box>
-          )}
         </Box>
       </CardContent>
     </Card>

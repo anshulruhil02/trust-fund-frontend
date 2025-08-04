@@ -1,22 +1,17 @@
 // src/app/create-fund/components/CreateTrustHeader.tsx
-'use client';
-import React from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  LinearProgress,
-  Chip,
-} from '@mui/material';
+"use client";
+import React from "react";
+import { Box, Typography, Button, LinearProgress, Chip } from "@mui/material";
+import Image from "next/image";
 import {
   Settings,
   People,
+  VerifiedUser,
   AccountBalance,
-  Preview,
   CheckCircle,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { CreateTrustStep } from '@/types/create-trust';
+} from "@mui/icons-material";
+import Link from "next/link";
+import { CreateTrustStep } from "@/types/create-trust";
 
 interface CreateTrustHeaderProps {
   steps: CreateTrustStep[];
@@ -37,59 +32,60 @@ const CreateTrustHeader: React.FC<CreateTrustHeaderProps> = ({
 }) => {
   const getStepIcon = (stepId: number) => {
     switch (stepId) {
-      case 1: return <Settings />;
-      case 2: return <People />;
-      case 3: return <AccountBalance />;
-      case 4: return <Preview />;
-      default: return <Settings />;
+      case 1:
+        return <Settings />;
+      case 2:
+        return <People />;
+      case 3:
+        return <VerifiedUser />; // Changed from AccountBalance to VerifiedUser for confirmation
+      case 4:
+        return <AccountBalance />; // Moved to step 4 for deposit
+      default:
+        return <Settings />;
     }
   };
 
+  const getStepTitle = (stepId: number) => {
+    switch (stepId) {
+      case 1:
+        return "Settings";
+      case 2:
+        return "Trustees";
+      case 3:
+        return "Confirmation";
+      case 4:
+        return "Deposit";
+      default:
+        return "Settings";
+    }
+  };
 
   return (
     <Box>
       {/* Top Header with Logo and Wallet */}
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           py: 2,
           px: 4,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          backgroundColor: 'background.paper',
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          backgroundColor: "background.paper",
         }}
       >
         {/* Logo and Back Button */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box
-                sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: 'primary.main',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-                  W
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 'bold',
-                  color: 'text.primary',
-                }}
-              >
-                WorthyTrust.
-              </Typography>
-            </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <Image
+              src="/images/worthytrust-logo.png"
+              alt="WorthyTrust"
+              height={40}
+              width={200}
+              style={{ width: "auto", height: "40px" }}
+              priority
+            />
           </Link>
         </Box>
 
@@ -122,8 +118,8 @@ const CreateTrustHeader: React.FC<CreateTrustHeaderProps> = ({
           sx={{
             height: 6,
             borderRadius: 3,
-            backgroundColor: 'grey.200',
-            '& .MuiLinearProgress-bar': {
+            backgroundColor: "grey.200",
+            "& .MuiLinearProgress-bar": {
               borderRadius: 3,
             },
           }}
@@ -134,94 +130,114 @@ const CreateTrustHeader: React.FC<CreateTrustHeaderProps> = ({
       <Box sx={{ px: 4, py: 3 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             mb: 3,
+            position: "relative",
           }}
         >
-          {steps.map((step, index) => {
-            const isClickable = step.isCompleted || step.isActive || index < currentStep - 1;
+          {/* Connecting Line Background */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 24,
+              left: "12.5%", // Start from first step center
+              right: "12.5%", // End at last step center
+              height: 2,
+              backgroundColor: "grey.300",
+              zIndex: 0,
+            }}
+          />
+
+          {Array.from({ length: 4 }, (_, index) => {
+            const stepNumber = index + 1;
+            const step = steps.find(s => s.id === stepNumber);
+            const isCompleted = stepNumber < currentStep;
+            const isActive = stepNumber === currentStep;
+            const isClickable = isCompleted || isActive || stepNumber < currentStep;
 
             return (
               <Box
-                key={step.id}
+                key={stepNumber}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                   flex: 1,
-                  cursor: isClickable && onStepClick ? 'pointer' : 'default',
-                  opacity: step.isActive || step.isCompleted ? 1 : 0.6,
+                  cursor: isClickable && onStepClick ? "pointer" : "default",
+                  opacity: isActive || isCompleted ? 1 : 0.6,
+                  position: "relative",
+                  zIndex: 1,
                 }}
-                onClick={() => isClickable && onStepClick?.(step.id)}
+                onClick={() => isClickable && onStepClick?.(stepNumber)}
               >
                 {/* Step Circle */}
                 <Box
                   sx={{
                     width: 48,
                     height: 48,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: step.isCompleted
-                      ? 'success.main'
-                      : step.isActive
-                      ? 'primary.main'
-                      : 'grey.300',
-                    color: step.isCompleted || step.isActive
-                      ? 'white'
-                      : 'text.secondary',
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: isCompleted
+                      ? "success.main"
+                      : isActive
+                      ? "primary.main"
+                      : "grey.300",
+                    color: isCompleted || isActive ? "white" : "text.secondary",
                     mb: 1,
-                    position: 'relative',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': isClickable ? {
-                      transform: 'scale(1.05)',
-                      boxShadow: 2,
-                    } : {},
+                    position: "relative",
+                    transition: "all 0.2s ease-in-out",
+                    "&:hover": isClickable
+                      ? {
+                          transform: "scale(1.05)",
+                          boxShadow: 2,
+                        }
+                      : {},
                   }}
                 >
-                  {step.isCompleted ? (
+                  {isCompleted ? (
                     <CheckCircle sx={{ fontSize: 24 }} />
                   ) : (
-                    getStepIcon(step.id)
+                    getStepIcon(stepNumber)
                   )}
 
                   {/* Step Number Badge */}
                   <Box
                     sx={{
-                      position: 'absolute',
+                      position: "absolute",
                       top: -4,
                       right: -4,
                       width: 20,
                       height: 20,
-                      borderRadius: '50%',
-                      backgroundColor: 'background.paper',
+                      borderRadius: "50%",
+                      backgroundColor: "background.paper",
                       border: 2,
-                      borderColor: step.isCompleted
-                        ? 'success.main'
-                        : step.isActive
-                        ? 'primary.main'
-                        : 'grey.300',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      borderColor: isCompleted
+                        ? "success.main"
+                        : isActive
+                        ? "primary.main"
+                        : "grey.300",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
                     <Typography
                       variant="caption"
                       sx={{
-                        fontSize: '0.625rem',
-                        fontWeight: 'bold',
-                        color: step.isCompleted
-                          ? 'success.main'
-                          : step.isActive
-                          ? 'primary.main'
-                          : 'text.secondary',
+                        fontSize: "0.625rem",
+                        fontWeight: "bold",
+                        color: isCompleted
+                          ? "success.main"
+                          : isActive
+                          ? "primary.main"
+                          : "text.secondary",
                       }}
                     >
-                      {step.id}
+                      {stepNumber}
                     </Typography>
                   </Box>
                 </Box>
@@ -230,52 +246,42 @@ const CreateTrustHeader: React.FC<CreateTrustHeaderProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    fontWeight: step.isActive ? 600 : 500,
-                    color: step.isActive ? 'primary.main' : 'text.secondary',
-                    textAlign: 'center',
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? "primary.main" : "text.secondary",
+                    textAlign: "center",
                     mb: 0.5,
                   }}
                 >
-                  {step.title}
+                  {getStepTitle(stepNumber)}
                 </Typography>
 
-                {/* Validation Indicators - removed since validation is handled in parent */}
-                {/* <Box sx={{ display: 'flex', gap: 0.5 }}>
-                  {hasErrors && (
-                    <Chip
-                      size="small"
-                      label={`${step.validation.errors.length} error${step.validation.errors.length > 1 ? 's' : ''}`}
-                      color="error"
-                      sx={{ fontSize: '0.625rem', height: 16 }}
-                    />
-                  )}
-                  {hasWarnings && (
-                    <Chip
-                      size="small"
-                      label={`${step.validation.warnings.length} warning${step.validation.warnings.length > 1 ? 's' : ''}`}
-                      color="warning"
-                      sx={{ fontSize: '0.625rem', height: 16 }}
-                    />
-                  )}
-                </Box> */}
-
-                {/* Connecting Line */}
-                {index < steps.length - 1 && (
+                {/* Progress Line to Next Step */}
+                {stepNumber < 4 && (
                   <Box
                     sx={{
-                      position: 'absolute',
+                      position: "absolute",
                       top: 24,
-                      left: '50%',
-                      width: `calc(100% - 48px)`,
+                      left: "50%",
+                      width: "100%",
                       height: 2,
-                      backgroundColor: step.isCompleted ? 'success.main' : 'grey.300',
-                      zIndex: 0,
+                      backgroundColor: isCompleted ? "success.main" : "grey.300",
+                      zIndex: -1,
                     }}
                   />
                 )}
               </Box>
             );
           })}
+        </Box>
+
+        {/* Step Description */}
+        <Box sx={{ textAlign: "center", mt: 2 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            {currentStep === 1 && "Configure your trust settings and basic information"}
+            {currentStep === 2 && "Add trustees and configure their permissions"}
+            {currentStep === 3 && "Review trustee confirmations and deploy your trust"}
+            {currentStep === 4 && "Add initial assets to fund your trust"}
+          </Typography>
         </Box>
       </Box>
     </Box>

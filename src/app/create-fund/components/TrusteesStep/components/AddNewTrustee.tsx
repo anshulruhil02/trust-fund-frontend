@@ -9,8 +9,6 @@ import {
   Typography, 
   TextField, 
   Button,
-  Checkbox,
-  FormControlLabel,
   Divider,
   Alert
 } from '@mui/material';
@@ -22,37 +20,19 @@ import { WalletAddressManager } from '@/hooks/useWalletAddressManager';
 interface AddNewTrusteeProps {
   onAddTrustee: (trustee: Omit<Trustee, 'id'>) => void;
   validation?: StepValidation;
-  walletAddressManager: WalletAddressManager; // Use centralized manager
+  walletAddressManager: WalletAddressManager;
+  sharedPermissions: TrusteePermissions; // New prop for shared permissions
 }
 
 const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
   onAddTrustee,
   validation,
   walletAddressManager,
+  sharedPermissions,
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
-  const [permissions, setPermissions] = useState<TrusteePermissions>({
-    canDissolve: false,
-    canChangeBeneficiary: false,
-    canAdjustPayouts: false,
-    canAddRemoveTrustees: false,
-    canModifyAssetAllocation: false,
-    canRemoveTrustee: false,
-    canDisablePayouts: false,
-  });
-
-  // Permission options for the UI
-  const permissionOptions = [
-    { key: 'canDissolve', label: 'Can dissolve trust (Make Revocable)' },
-    { key: 'canChangeBeneficiary', label: 'Can change beneficiary' },
-    { key: 'canAdjustPayouts', label: 'Can adjust payouts (max 10%)' },
-    { key: 'canAddRemoveTrustees', label: 'Can add/remove trustees' },
-    { key: 'canModifyAssetAllocation', label: 'Can modify asset allocation' },
-    { key: 'canRemoveTrustee', label: 'Can remove Trustee' },
-    { key: 'canDisablePayouts', label: 'Can Disable Payouts' },
-  ];
 
   // Real-time field validation using wallet address manager
   const fieldValidation = useMemo(() => {
@@ -67,12 +47,12 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
       errors.name = 'Name must be less than 50 characters';
     }
 
-    // Email validation
+    // Email validation - only validate if email is provided
     if (email && email.trim().length > 0 && !isValidEmail(email.trim())) {
       errors.email = 'Please enter a valid email address';
     }
 
-    // Wallet address validation using centralized manager
+    // Wallet address validation - only validate if address is provided
     if (walletAddress && walletAddress.trim().length > 0) {
       const addressValidation = walletAddressManager.validateNewAddress(
         walletAddress.trim(), 
@@ -89,47 +69,42 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
     return { errors, warnings };
   }, [name, email, walletAddress, walletAddressManager]);
 
-  // Handle permission changes
-  const handlePermissionChange = (key: keyof TrusteePermissions) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPermissions(prev => ({
-      ...prev,
-      [key]: event.target.checked,
-    }));
-  };
-
   // Handle form submission
   const handleAddTrustee = () => {
-    // Final validation before submitting using centralized manager
-    if (!walletAddress.trim()) {
+    // Require either name or email to be provided
+    if (!name.trim() && !email.trim()) {
       return;
     }
 
-    const addressValidation = walletAddressManager.validateNewAddress(
-      walletAddress.trim(), 
-      'trustee'
-    );
+    // Validate wallet address only if provided
+    if (walletAddress.trim()) {
+      const addressValidation = walletAddressManager.validateNewAddress(
+        walletAddress.trim(), 
+        'trustee'
+      );
 
-    if (!addressValidation.isValid) {
-      return;
+      if (!addressValidation.isValid) {
+        return;
+      }
     }
 
+    // Validate email only if provided
     if (email.trim() && !isValidEmail(email.trim())) {
       return;
     }
 
+    // Validate name only if provided
     if (name.trim() && name.trim().length < 2) {
       return;
     }
 
     const newTrustee: Omit<Trustee, 'id'> = {
-      address: walletAddress.trim(),
+      address: walletAddress.trim() || '', // Empty string if no wallet address
       name: name.trim() || undefined,
       email: email.trim() || undefined,
       role: 'trustee',
-      isConfirmed: false,
-      permissions: permissions,  
+      isConfirmed: !!walletAddress.trim(), // Only confirmed if wallet address is provided
+      permissions: sharedPermissions, // Use shared permissions
     };
 
     onAddTrustee(newTrustee);
@@ -138,28 +113,26 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
     setName('');
     setEmail('');
     setWalletAddress('');
-    setPermissions({
-      canDissolve: false,
-      canChangeBeneficiary: false,
-      canAdjustPayouts: false,
-      canAddRemoveTrustees: false,
-      canModifyAssetAllocation: false,
-      canRemoveTrustee: false,
-      canDisablePayouts: false,
-    });
   };
 
   // Check if form is valid for submission
   const isFormValid = useMemo(() => {
-    if (!walletAddress.trim()) return false;
+    // Require at least name or email
+    const hasIdentity = name.trim() || email.trim();
+    if (!hasIdentity) return false;
     
-    const addressValidation = walletAddressManager.validateNewAddress(
-      walletAddress.trim(), 
-      'trustee'
-    );
+    // Validate wallet address only if provided
+    if (walletAddress.trim()) {
+      const addressValidation = walletAddressManager.validateNewAddress(
+        walletAddress.trim(), 
+        'trustee'
+      );
+      
+      if (!addressValidation.isValid) return false;
+    }
     
+    // Check other field validations
     return (
-      addressValidation.isValid &&
       (!email.trim() || isValidEmail(email.trim())) &&
       (!name.trim() || name.trim().length >= 2) &&
       Object.keys(fieldValidation.errors).length === 0
@@ -196,7 +169,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
             Add New Trustee
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Invite trustees to help manage this trust
+            Add trustees to help manage this trust. Trustees need either a name and email, and can optionally have a wallet address.
           </Typography>
         </Box>
 
@@ -225,7 +198,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
             {/* Name Field */}
             <Box>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Name (Optional)
+                Name
               </Typography>
               <TextField
                 fullWidth
@@ -236,7 +209,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
                 helperText={
                   fieldValidation.errors.name || 
                   getFieldError('trustee name') ||
-                  'Optional: Display name for this trustee'
+                  'Display name for this trustee'
                 }
               />
             </Box>
@@ -244,7 +217,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
             {/* Email Field */}
             <Box>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Email (Optional)
+                Email
               </Typography>
               <TextField
                 fullWidth
@@ -256,7 +229,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
                 helperText={
                   fieldValidation.errors.email || 
                   getFieldError('trustee email') ||
-                  'Optional: Email for notifications'
+                  'Email for notifications'
                 }
               />
             </Box>
@@ -264,7 +237,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
             {/* Wallet Address Field */}
             <Box>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Wallet Address *
+                Wallet Address (Optional)
               </Typography>
               <TextField
                 fullWidth
@@ -280,9 +253,8 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
                   fieldValidation.errors.walletAddress ||
                   getFieldError('trustee address') || 
                   getFieldError('wallet address') || 
-                  'Required: Valid Ethereum address (0x...)'
+                  'Optional: Ethereum address for immediate confirmation'
                 }
-                required
               />
             </Box>
           </Box>
@@ -290,37 +262,30 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
 
         <Divider sx={{ my: 4 }} />
 
-        {/* Permissions Section */}
+        {/* Permissions Info Section */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             Trustee Permissions
           </Typography>
-          <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-            Select the permissions this trustee will have. These cannot be changed after the invitation is accepted.
-          </Typography>
           
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-            gap: 2 
-          }}>
-            {permissionOptions.map((option) => (
-              <FormControlLabel
-                key={option.key}
-                control={
-                  <Checkbox
-                    checked={permissions[option.key as keyof TrusteePermissions]}
-                    onChange={handlePermissionChange(option.key as keyof TrusteePermissions)}
-                  />
-                }
-                label={
-                  <Typography variant="body2">
-                    {option.label}
-                  </Typography>
-                }
-                sx={{ m: 0 }}
-              />
-            ))}
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              Provide at least a name and email to add a trustee. Trustees with wallet addresses are automatically confirmed and ready to participate.
+            </Typography>
+          </Alert>
+
+          {/* Current Permissions Summary */}
+          <Box sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+              Current Permission Settings
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {Object.values(sharedPermissions).some(p => p) 
+                ? `Trustees will have ${Object.values(sharedPermissions).filter(p => p).length} permission${Object.values(sharedPermissions).filter(p => p).length === 1 ? '' : 's'} enabled.`
+                : 'Trustees will have view-only access (no special permissions).'
+              }
+              {walletAddress.trim() ? ' This trustee will be automatically confirmed.' : ' Trustees without wallet addresses will need to be confirmed later.'}
+            </Typography>
           </Box>
         </Box>
 
@@ -336,7 +301,7 @@ const AddNewTrustee: React.FC<AddNewTrusteeProps> = ({
               fontWeight: 600
             }}
           >
-            Send Invitation
+            Add Trustee
           </Button>
         </Box>
       </CardContent>
