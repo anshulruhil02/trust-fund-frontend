@@ -12,6 +12,8 @@ import {
   Grid,
   Stack,
   useTheme,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import {
   AccountBalanceWallet,
@@ -340,6 +342,30 @@ export default function LandingPage() {
       </Paper>
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Demo Notice Banner */}
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            mb: 4, 
+            borderRadius: 2,
+            '& .MuiAlert-message': {
+              width: '100%'
+            }
+          }}
+        >
+          <AlertTitle sx={{ fontWeight: 'bold' }}>Demo Environment - Not Production Ready</AlertTitle>
+          This is a demonstration version of WorthyTrust. All data shown is simulated. 
+          <strong> Do not deposit actual funds.</strong>
+          <br /><br />
+          <strong>Important limitations:</strong>
+          <br />
+          • Email notifications are disabled and will not be sent
+          <br />
+          • Trust contracts have not been audited and are not implied to be secure
+          <br />
+          • This demo is for educational and testing purposes only
+        </Alert>
+
         {/* Main content sections stacked vertically */}
         <Stack spacing={5}>
           {/* Hero Section */}
@@ -371,29 +397,54 @@ export default function LandingPage() {
               with complete transparency and security
             </Typography>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<Shield />}
-              onClick={isConnected ? undefined : () => open()}
-              component={isConnected ? Link : "button"}
-              href={isConnected ? "/create-fund" : undefined}
-              sx={{
-                px: 5,
-                py: 1.5,
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                borderRadius: 2,
-                backgroundColor: "#4285f4",
-                "&:hover": { backgroundColor: "#3367d6" },
-                textDecoration: "none",
-              }}
-            >
-              {isConnected ? "Set Up Your Trust" : "Connect Wallet"}
-            </Button>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<Shield />}
+                onClick={isConnected ? undefined : () => open()}
+                component={isConnected ? Link : "button"}
+                href={isConnected ? "/create-fund" : undefined}
+                sx={{
+                  px: 5,
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  backgroundColor: "#4285f4",
+                  "&:hover": { backgroundColor: "#3367d6" },
+                  textDecoration: "none",
+                }}
+              >
+                {isConnected ? "Set Up Your Trust" : "Connect Wallet"}
+              </Button>
+              
+              <Button
+                variant="outlined"
+                size="large"
+                component={Link}
+                href="/create-fund"
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  borderColor: "#ff9800",
+                  color: "#ff9800",
+                  "&:hover": { 
+                    borderColor: "#f57c00",
+                    backgroundColor: "rgba(255, 152, 0, 0.04)"
+                  },
+                  textDecoration: "none",
+                }}
+              >
+                🚀 Demo Mode - Skip Wallet
+              </Button>
+            </Stack>
 
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              Start building a decentralized trust in minutes
+              Start building a decentralized trust in minutes • Demo mode allows you to explore without wallet connection
             </Typography>
           </Box>
 
