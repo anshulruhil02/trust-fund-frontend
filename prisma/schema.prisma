@@ -7,44 +7,251 @@ generator client {
 }
 
 // This block configures your database connection.
-// It tells Prisma to use the environment variable from your .env.local file.
+// It tells Prisma to use the environment variable from your .env file.
 datasource db {
   provider = "postgresql"
   url      = env("POSTGRES_PRISMA_URL") 
 }
 
-// 1. The Users Table
+// ===== ENHANCED USER MODEL =====
 model User {
   id                String     @id @default(uuid())
   walletAddress     String     @unique
-  fireblocksVaultId String
+  fireblocksVaultId String?    // Made optional since you're not using Fireblocks now
   email             String?
   createdAt         DateTime   @default(now())
-  trustsCreated     Trust[]    @relation("Creator")
-  proposalsProposed Proposal[] @relation("Proposer")
+  updatedAt         DateTime   @updatedAt
+  
+  // Enhanced relationships
+  trustsCreated     Trust[]           @relation("Creator")
+  proposalsProposed Proposal[]        @relation("Proposer")
+  trusteeRoles      Trustee[]
+  beneficiaryRoles  Beneficiary[]
+  deposits          Deposit[]
+  votes             Vote[]
+  
+  @@map("users")
 }
 
-// 2. The Trusts Table
+// ===== ENHANCED TRUST MODEL =====
 model Trust {
   id               String     @id @default(uuid())
   contractAddress  String     @unique
   name             String
-  purposeStatement String
+  purposeStatement String     @db.Text
+  
+  // Enhanced trust properties
+  totalValueUsd    Decimal?   @db.Decimal(18, 2)
+  status           TrustStatus @default(ACTIVE)
+  
+  // Payout settings (from your UI)
+  payoutFrequency    PayoutFrequency @default(MONTHLY)
+  payoutAmount       Decimal?        @db.Decimal(18, 2)
+  payoutCurrency     String          @default("USD")
+  payoutMethod       PayoutMethod    @default(IN_KIND)
+  firstPaymentDate   DateTime?
+  
   createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   creatorUserId    String
-  creator          User       @relation("Creator", fields: [creatorUserId], references: [id])
+  
+  // Enhanced relationships
+  creator          User           @relation("Creator", fields: [creatorUserId], references: [id])
   proposals        Proposal[]
+  trustees         Trustee[]
+  beneficiaries    Beneficiary[]
+  deposits         Deposit[]
+  
+  @@map("trusts")
 }
 
-// 3. The Proposals Table
+enum TrustStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  DISSOLVED
+}
+
+enum PayoutFrequency {
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+  CUSTOM
+}
+
+enum PayoutMethod {
+  IN_KIND
+  CASH_EQUIVALENT
+  SPECIFIC_TOKENS
+}
+
+// ===== NEW: TRUSTEES TABLE =====
+model Trustee {
+  id            String   @id @default(uuid())
+  trustId       String
+  userId        String
+  name          String?
+  email         String?
+  permissions   Json     // Store permissions as JSON: {dissolve: true, adjustPayouts: false, etc}
+  status        ParticipantStatus @default(INVITED)
+  invitedAt     DateTime @default(now())
+  confirmedAt   DateTime?
+  
+  // Relationships
+  trust         Trust    @relation(fields: [trustId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id])
+  votes         Vote[]
+  
+  @@unique([trustId, userId])
+  @@map("trustees")
+}
+
+// ===== NEW: BENEFICIARIES TABLE =====
+model Beneficiary {
+  id                 String   @id @default(uuid())
+  trustId            String
+  userId             String
+  name               String?
+  email              String?
+  allocationPercent  Decimal  @db.Decimal(5, 2) // e.g., 25.50 for 25.5%
+  status             ParticipantStatus @default(ACTIVE)
+  addedAt            DateTime @default(now())
+  
+  // Relationships
+  trust              Trust    @relation(fields: [trustId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id])
+  
+  @@unique([trustId, userId])
+  @@map("beneficiaries")
+}
+
+enum ParticipantStatus {
+  INVITED
+  ACTIVE
+  REMOVED
+}
+
+// ===== NEW: DEPOSITS TABLE =====
+model Deposit {
+  id              String   @id @default(uuid())
+  trustId         String
+  depositorUserId String
+  tokenAddress    String   // 0x0 for ETH, contract address for ERC20
+  tokenSymbol     String   // ETH, LINK, USDC, etc
+  amount          String   // Store as string to avoid precision issues
+  amountUsd       Decimal? @db.Decimal(18, 2)
+  transactionHash String   @unique
+  blockNumber     BigInt?
+  status          TransactionStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+  confirmedAt     DateTime?
+  
+  // Relationships
+  trust           Trust    @relation(fields: [trustId], references: [id], onDelete: Cascade)
+  depositor       User     @relation(fields: [depositorUserId], references: [id])
+  
+  @@map("deposits")
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+// ===== ENHANCED PROPOSAL MODEL =====
 model Proposal {
-  id             String   @id @default(uuid())
-  onChainId      Int
+  id             String         @id @default(uuid())
+  onChainId      Int?           // Made optional in case not all proposals are on-chain yet
   title          String
-  description    String
-  createdAt      DateTime @default(now())
+  description    String         @db.Text
+  
+  // Enhanced proposal properties
+  proposalType   ProposalType
+  proposalData   Json?          // Additional data specific to proposal type
+  votesFor       Int            @default(0)
+  votesAgainst   Int            @default(0)
+  quorumRequired Int            @default(1)
+  votingDeadline DateTime
+  status         ProposalStatus @default(ACTIVE)
+  
+  createdAt      DateTime       @default(now())
+  executedAt     DateTime?
   trustId        String
-  trust          Trust    @relation(fields: [trustId], references: [id])
   proposerUserId String
-  proposer       User     @relation("Proposer", fields: [proposerUserId], references: [id])
+  
+  // Enhanced relationships
+  trust          Trust          @relation(fields: [trustId], references: [id])
+  proposer       User           @relation("Proposer", fields: [proposerUserId], references: [id])
+  votes          Vote[]
+  
+  @@map("proposals")
+}
+
+enum ProposalType {
+  ADJUST_PAYOUTS
+  CHANGE_BENEFICIARY
+  ADD_TRUSTEE
+  REMOVE_TRUSTEE
+  EMERGENCY_WITHDRAW
+  DISSOLVE_TRUST
+}
+
+enum ProposalStatus {
+  ACTIVE
+  PASSED
+  FAILED
+  EXECUTED
+  EXPIRED
+}
+
+// ===== NEW: VOTES TABLE =====
+model Vote {
+  id         String     @id @default(uuid())
+  proposalId String
+  trusteeId  String     // Reference to Trustee record
+  voterUserId String    // Direct reference to User
+  voteChoice VoteChoice
+  createdAt  DateTime   @default(now())
+  
+  // Relationships
+  proposal   Proposal   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  trustee    Trustee    @relation(fields: [trusteeId], references: [id])
+  voter      User       @relation(fields: [voterUserId], references: [id])
+  
+  @@unique([proposalId, trusteeId])
+  @@map("votes")
+}
+
+enum VoteChoice {
+  FOR
+  AGAINST
+  ABSTAIN
+}
+
+// ===== NEW: ACTIVITY LOG =====
+model ActivityLog {
+  id          String       @id @default(uuid())
+  trustId     String?
+  userId      String?
+  action      ActivityType
+  description String
+  metadata    Json?        // Store additional context
+  createdAt   DateTime     @default(now())
+  
+  @@map("activity_logs")
+}
+
+enum ActivityType {
+  TRUST_CREATED
+  TRUST_FUNDED
+  DEPOSIT_MADE
+  WITHDRAWAL_MADE
+  PROPOSAL_CREATED
+  VOTE_CAST
+  PROPOSAL_EXECUTED
+  TRUSTEE_ADDED
+  TRUSTEE_REMOVED
+  BENEFICIARY_ADDED
+  BENEFICIARY_REMOVED
 }
