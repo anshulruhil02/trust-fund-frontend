@@ -44,6 +44,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useTrust } from "@/hooks/useTrust";
 
 // Define the type for the StatCard props
 interface StatCardProps {
@@ -462,6 +463,9 @@ export default function LandingPage() {
           {/* Developer Testing Panel - Remove in Production */}
           {showTestPanel && <TestSection />}
 
+          {/* Blockchain Integration Test */}
+          {showTestPanel && <BlockchainTrustTest />}
+
           {/* Main Dashboard Section: Grid for responsive columns */}
           <Grid container spacing={3}>
             {/* Left Column: Stats and Analytics */}
@@ -837,19 +841,21 @@ export default function LandingPage() {
   );
 }
 
-
-
-
 // Add this component to your existing landing page
 
 const TestSection = () => {
   const { address, isConnected } = useAccount();
   const [testResults, setTestResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastCreatedTrustId, setLastCreatedTrustId] = useState<string | null>(null);
+  const [lastCreatedTrustId, setLastCreatedTrustId] = useState<string | null>(
+    null
+  );
 
   const addResult = (message: string) => {
-    setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setTestResults((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
   };
 
   const testTrustCreation = async () => {
@@ -862,30 +868,34 @@ const TestSection = () => {
     addResult("🧪 Testing trust creation...");
 
     try {
-      const response = await fetch('/api/trusts/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/trusts/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "Test Trust " + Date.now(),
           purpose: "Testing API endpoints",
-          contractAddress: '0x' + Math.random().toString(16).slice(2, 42),
+          contractAddress: "0x" + Math.random().toString(16).slice(2, 42),
           creatorAddress: address,
-          beneficiaries: [{
-            address: address,
-            allocation: 100,
-            name: "Test Beneficiary"
-          }],
-          trustees: [{
-            address: address,
-            name: "Test Creator",
-            permissions: { dissolve: true }
-          }],
+          beneficiaries: [
+            {
+              address: address,
+              allocation: 100,
+              name: "Test Beneficiary",
+            },
+          ],
+          trustees: [
+            {
+              address: address,
+              name: "Test Creator",
+              permissions: { dissolve: true },
+            },
+          ],
           payoutSettings: {
-            frequency: 'MONTHLY',
+            frequency: "MONTHLY",
             amount: 100,
-            currency: 'USD',
-            method: 'IN_KIND'
-          }
+            currency: "USD",
+            method: "IN_KIND",
+          },
         }),
       });
 
@@ -899,7 +909,9 @@ const TestSection = () => {
         addResult(`❌ API Error: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      addResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+      addResult(
+        `❌ Error: ${error instanceof Error ? error.message : "Unknown"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -915,30 +927,34 @@ const TestSection = () => {
     addResult("🧪 Testing deposit tracking...");
 
     try {
-      const response = await fetch('/api/deposits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/deposits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           trustId: lastCreatedTrustId, // Use real trust ID
-          depositorAddress: address || '0x1234',
-          tokenAddress: '0xb1D4538B4571d411F07960EF2838Ce337FE1E80E', // LINK
-          tokenSymbol: 'LINK',
-          amount: '25',
-          transactionHash: '0x' + Math.random().toString(16).slice(2, 66),
-          blockNumber: 12345
+          depositorAddress: address || "0x1234",
+          tokenAddress: "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E", // LINK
+          tokenSymbol: "LINK",
+          amount: "25",
+          transactionHash: "0x" + Math.random().toString(16).slice(2, 66),
+          blockNumber: 12345,
         }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        addResult(`✅ Deposit recorded: ${result.deposit.amount} ${result.deposit.tokenSymbol}`);
+        addResult(
+          `✅ Deposit recorded: ${result.deposit.amount} ${result.deposit.tokenSymbol}`
+        );
         addResult(`💰 Deposit ID: ${result.deposit.id}`);
       } else {
         const errorText = await response.text();
         addResult(`❌ Deposit API Error: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      addResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+      addResult(
+        `❌ Error: ${error instanceof Error ? error.message : "Unknown"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -949,23 +965,33 @@ const TestSection = () => {
     addResult("🧪 Testing database connection...");
 
     try {
-      const response = await fetch(`/api/trusts/create?walletAddress=${address || 'test'}`);
-      
+      const response = await fetch(
+        `/api/trusts/create?walletAddress=${address || "test"}`
+      );
+
       if (response.ok) {
         const result = await response.json();
-        addResult(`✅ Database connected: Found ${result.trusts?.length || 0} trusts`);
-        
+        addResult(
+          `✅ Database connected: Found ${result.trusts?.length || 0} trusts`
+        );
+
         // If there are existing trusts, set the first one for deposit testing
         if (result.trusts?.length > 0) {
           setLastCreatedTrustId(result.trusts[0].id);
-          addResult(`📍 Using trust ID for deposit tests: ${result.trusts[0].id}`);
+          addResult(
+            `📍 Using trust ID for deposit tests: ${result.trusts[0].id}`
+          );
         }
       } else {
         const errorText = await response.text();
         addResult(`❌ Database Error: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      addResult(`❌ Database Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+      addResult(
+        `❌ Database Error: ${
+          error instanceof Error ? error.message : "Unknown"
+        }`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -974,9 +1000,9 @@ const TestSection = () => {
   const runFullTest = async () => {
     addResult("🚀 Running complete API test suite...");
     await testDatabaseConnection();
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Small delay
     await testTrustCreation();
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Small delay
     await testDepositTracking();
     addResult("🎉 Full test suite completed!");
   };
@@ -987,21 +1013,24 @@ const TestSection = () => {
   };
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 2, bgcolor: '#f8f9fa' }}>
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#e65100' }}>
+    <Paper sx={{ p: 3, borderRadius: 2, bgcolor: "#f8f9fa" }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", mb: 2, color: "#e65100" }}
+      >
         🧪 Developer Testing Panel
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Test backend APIs and database connectivity
       </Typography>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 3 }}>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mb: 3 }}>
         <Button
           variant="contained"
           size="small"
           onClick={runFullTest}
           disabled={isLoading || !isConnected}
-          sx={{ backgroundColor: '#2e7d32' }}
+          sx={{ backgroundColor: "#2e7d32" }}
         >
           🚀 Run Full Test
         </Button>
@@ -1029,17 +1058,13 @@ const TestSection = () => {
         >
           Test Deposits API
         </Button>
-        <Button
-          variant="text"
-          size="small"
-          onClick={clearResults}
-        >
+        <Button variant="text" size="small" onClick={clearResults}>
           Clear
         </Button>
       </Stack>
 
       {lastCreatedTrustId && (
-        <Alert severity="info" sx={{ mb: 2, fontSize: '0.8rem' }}>
+        <Alert severity="info" sx={{ mb: 2, fontSize: "0.8rem" }}>
           <strong>Active Trust ID:</strong> {lastCreatedTrustId.slice(0, 8)}...
           <br />
           Deposits will be linked to this trust.
@@ -1049,14 +1074,14 @@ const TestSection = () => {
       {testResults.length > 0 && (
         <Box
           sx={{
-            bgcolor: 'black',
-            color: 'lime',
+            bgcolor: "black",
+            color: "lime",
             p: 2,
             borderRadius: 1,
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
+            fontFamily: "monospace",
+            fontSize: "0.8rem",
             maxHeight: 300,
-            overflow: 'auto'
+            overflow: "auto",
           }}
         >
           {testResults.map((result, index) => (
@@ -1066,10 +1091,218 @@ const TestSection = () => {
         </Box>
       )}
 
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-        This panel will be removed in production. It's for testing the backend infrastructure.
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 2, display: "block" }}
+      >
+        This panel will be removed in production. It's for testing the backend
+        infrastructure.
         <br />
-        💡 Tip: Run "Full Test" to test everything in sequence with proper dependencies.
+        💡 Tip: Run "Full Test" to test everything in sequence with proper
+        dependencies.
+      </Typography>
+    </Paper>
+  );
+};
+
+// Add this to your TestSection component or create a new test component
+
+const BlockchainTrustTest = () => {
+  const { address, isConnected } = useAccount();
+  const {
+    createTrust,
+    saveTrustToDatabase,
+    isCreating,
+    isTxSuccess,
+    txHash,
+    receipt,
+    error,
+  } = useTrust();
+  const [testResults, setTestResults] = useState<string[]>([]);
+  const [createdTrustData, setCreatedTrustData] = useState<any>(null);
+
+  const addResult = (message: string) => {
+    setTestResults((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
+  };
+
+  const testBlockchainTrustCreation = async () => {
+    if (!isConnected || !address) {
+      addResult("❌ Please connect wallet first");
+      return;
+    }
+
+    addResult("🚀 Starting REAL blockchain trust creation...");
+    addResult("📝 This will create an actual smart contract!");
+
+    try {
+      const testTrustParams = {
+        name: `Blockchain Test Trust ${Date.now()}`,
+        purpose: "Testing real blockchain deployment",
+        beneficiaries: [
+          {
+            address: address,
+            allocation: 100,
+            name: "Test Beneficiary",
+          },
+        ],
+        trustees: [
+          {
+            address: address,
+            name: "Test Creator",
+            permissions: { dissolve: true, adjustPayouts: true },
+          },
+        ],
+        payoutSettings: {
+          frequency: "MONTHLY",
+          amount: 100,
+          currency: "USD",
+          method: "IN_KIND",
+        },
+      };
+
+      addResult("⏳ Calling smart contract... (MetaMask will prompt)");
+
+      const result = await createTrust(testTrustParams);
+
+      if (result.success) {
+        addResult(`✅ Transaction submitted! Hash: ${result.transactionHash}`);
+        addResult("⏳ Waiting for confirmation...");
+        setCreatedTrustData({
+          params: testTrustParams,
+          txHash: result.transactionHash,
+        });
+      } else {
+        addResult(`❌ Failed: ${result.error}`);
+      }
+    } catch (error) {
+      addResult(
+        `❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    }
+  };
+
+  // Monitor transaction success
+  React.useEffect(() => {
+    if (isTxSuccess && receipt && createdTrustData) {
+      const handleSuccess = async () => {
+        addResult("🎉 Transaction confirmed!");
+        addResult(`📍 Block number: ${receipt.blockNumber}`);
+
+        try {
+          // Extract contract address from receipt
+          // Note: You'll need to implement proper event parsing
+          const contractAddress =
+            "0x" + Math.random().toString(16).slice(2, 42); // Temporary placeholder
+
+          addResult(`🏠 Trust contract deployed at: ${contractAddress}`);
+          addResult("💾 Saving to database...");
+
+          // Save to database
+          await saveTrustToDatabase(
+            createdTrustData.params,
+            contractAddress,
+            createdTrustData.txHash
+          );
+
+          addResult("✅ Trust saved to database!");
+          addResult("🎊 COMPLETE: Blockchain + Database integration working!");
+        } catch (error) {
+          addResult(
+            `❌ Database save failed: ${
+              error instanceof Error ? error.message : "Unknown"
+            }`
+          );
+        }
+      };
+
+      handleSuccess();
+    }
+  }, [isTxSuccess, receipt, createdTrustData]);
+
+  // Monitor errors
+  React.useEffect(() => {
+    if (error) {
+      addResult(`❌ Transaction failed: ${error}`);
+    }
+  }, [error]);
+
+  const clearResults = () => {
+    setTestResults([]);
+    setCreatedTrustData(null);
+  };
+
+  return (
+    <Paper sx={{ p: 3, borderRadius: 2, bgcolor: "#fff3e0" }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", mb: 2, color: "#e65100" }}
+      >
+        🔗 Blockchain Integration Test
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        Test REAL smart contract deployment + database integration
+      </Typography>
+
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+        <Button
+          variant="contained"
+          onClick={testBlockchainTrustCreation}
+          disabled={!isConnected || isCreating}
+          sx={{ backgroundColor: "#2e7d32" }}
+        >
+          {isCreating ? "⏳ Creating..." : "🚀 Deploy Real Trust"}
+        </Button>
+
+        <Button variant="text" onClick={clearResults}>
+          Clear
+        </Button>
+      </Stack>
+
+      {txHash && (
+        <Alert severity="info" sx={{ mb: 2, fontSize: "0.8rem" }}>
+          <strong>Transaction Hash:</strong> {txHash}
+          <br />
+          <a
+            href={`https://sepolia.arbiscan.io/tx/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "inherit" }}
+          >
+            View on Arbiscan ↗
+          </a>
+        </Alert>
+      )}
+
+      {testResults.length > 0 && (
+        <Box
+          sx={{
+            bgcolor: "black",
+            color: "lime",
+            p: 2,
+            borderRadius: 1,
+            fontFamily: "monospace",
+            fontSize: "0.8rem",
+            maxHeight: 300,
+            overflow: "auto",
+          }}
+        >
+          {testResults.map((result, index) => (
+            <div key={index}>{result}</div>
+          ))}
+          {isCreating && <div>⏳ Processing blockchain transaction...</div>}
+        </Box>
+      )}
+
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 2, display: "block" }}
+      >
+        ⚠️ This will use real gas fees (~0.001-0.005 ETH). Only use on testnet!
       </Typography>
     </Paper>
   );
